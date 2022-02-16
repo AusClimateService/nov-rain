@@ -21,14 +21,14 @@ ${INDEPENDENCE_PLOT} : ${FCST_ENSEMBLE_FILE}
 	independence $< ${VAR} $@
 
 ## bias-correction : bias corrected forecast data using observations
-#bias-correction : ${FCST_BIAS_FILE}
-#${FCST_BIAS_FILE} : ${FCST_ENSEMBLE_FILE} ${OBS_PROCESSED_FILE}
-#	bias_correction $< $(word 2,$^) ${VAR} ${BIAS_METHOD} $@ --base_period ${BASE_PERIOD} --rounding_freq A
+bias-correction : ${FCST_BIAS_FILE}
+${FCST_BIAS_FILE} : ${FCST_ENSEMBLE_FILE} ${OBS_NC_DATA}
+	bias_correction $< $(word 2,$^) ${VAR} ${BIAS_METHOD} $@ --base_period ${BASE_PERIOD} --rounding_freq A --min_lead ${MIN_LEAD}
 
 ## similarity-test : similarity test between observations and bias corrected forecast
-#similarity-test : ${SIMILARITY_FILE}
-#${SIMILARITY_FILE} : ${FCST_BIAS_FILE} ${OBS_PROCESSED_FILE}
-#	similarity $< $(word 2,$^) ${VAR} $@ --reference_time_period ${BASE_PERIOD}
+similarity-test : ${SIMILARITY_FILE}
+${SIMILARITY_FILE} : ${FCST_BIAS_FILE} ${OBS_NC_DATA}
+	similarity $< $(word 2,$^) ${VAR} $@ --reference_time_period ${BASE_PERIOD}
 
 ## final-analysis : do the final analysis
 #final-analysis : ag_analysis_${SUB_REGION}.ipynb
