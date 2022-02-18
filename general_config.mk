@@ -4,7 +4,7 @@ PROJECT_DIR=/g/data/xv83/dbi599/nov-rain
 
 VAR=pr
 UNITS=${VAR}='mm month-1'
-SHAPEFILE=${PROJECT_DIR}/AUS_2021_AUST_SHP_GDA2020.zip
+SHAPEFILE=${PROJECT_DIR}/shapefiles/australia.shp
 SPATIAL_AGG=mean
 TIME_AGG=sum
 BIAS_METHOD=additive

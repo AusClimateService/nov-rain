@@ -9,7 +9,7 @@ ${OBS_NC_DATA} : ${OBS_TXT_DATA}
 
 ## process-forecast : preprocessing of CAFE forecast ensemble
 process-forecast : ${FCST_ENSEMBLE_FILE}
-${FCST_ENSEMBLE_FILE} : ${FCST_METADATA}
+${FCST_ENSEMBLE_FILE} :
 	fileio ${FCST_DATA} $@ --forecast $< ${IO_OPTIONS} --reset_times --output_chunks lead_time=50 --dask_config ${DASK_CONFIG}
 
 ## independence-test : independence test for different lead times
