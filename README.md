@@ -22,16 +22,10 @@ Step 1: Prepare the shapefile
 $ papermill shapefile_preparation.ipynb
 ```
 
-Step 2: Perform the UNSEEN analysis using CAFE data
-```
-$ make analysis CONFIG=CAFE_config.mk
-```
-
-Step 3: Perform the UNSEEN analysis using CanESM5 data
+Step 2: Perform the UNSEEN analysis for any models that have a config file. e.g:
 
 ```
-$ python CanESM5_file_list.py
-$ make analysis CONFIG=CanESM5_config.mk
+$ make analysis MODEL_CONFIG=config_CanESM5.mk
 ```
 
 
