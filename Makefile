@@ -1,19 +1,8 @@
 .PHONY: help format-obs process-forecast independence-test bias-correction similarity-test analysis
 
 include ${MODEL_CONFIG}
-
-check_defined = \
-    $(strip $(foreach 1,$1, \
-        $(call __check_defined,$1,$(strip $(value 2)))))
-__check_defined = \
-    $(if $(value $1),, \
-      $(error Undefined $1$(if $2, ($2))))
-$(call check_defined, MODEL)
-## MODEL_IO_OPTIONS is optional
-$(call check_defined, MIN_LEAD)
-$(call check_defined, BASE_PERIOD)
-$(call check_defined, BASE_PERIOD_TEXT)
-$(call check_defined, TIME_PERIOD_TEXT)
+#Model config file needs to define MODEL, MODEL_IO_OPTIONS (optional) MIN_LEAD,
+#BASE_PERIOD, BASE_PERIOD_TEXT and TIME_PERIOD_TEXT
 
 PROJECT_DIR=/g/data/xv83/dbi599/nov-rain
 VAR=pr
@@ -71,7 +60,7 @@ analysis_${MODEL}.ipynb : analysis.ipynb ${OBS_NC_DATA} ${FCST_ENSEMBLE_FILE} ${
 
 ## help : show this message
 help :
-	@echo 'make [target] [-Bnf] CONFIG=config_file.mk'
+	@echo 'make [target] [-Bnf] MODEL_CONFIG=config_file.mk'
 	@echo ''
 	@echo 'valid targets:'
 	@grep -h -E '^##' ${MAKEFILE_LIST} | sed -e 's/## //g' | column -t -s ':'
