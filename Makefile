@@ -2,7 +2,7 @@
 
 include ${MODEL_CONFIG}
 #Model config file needs to define MODEL, MODEL_IO_OPTIONS (optional) MIN_LEAD,
-#BASE_PERIOD, BASE_PERIOD_TEXT and TIME_PERIOD_TEXT
+#BIAS_METHOD, BASE_PERIOD, BASE_PERIOD_TEXT and TIME_PERIOD_TEXT
 
 PROJECT_DIR=/g/data/xv83/dbi599/nov-rain
 VAR=pr
@@ -10,7 +10,6 @@ UNITS=${VAR}='mm month-1'
 SHAPEFILE=${PROJECT_DIR}/shapefiles/australia.shp
 SPATIAL_AGG=mean
 TIME_AGG=sum
-BIAS_METHOD=additive
 DASK_CONFIG=dask_local.yml
 IO_OPTIONS=--variables ${VAR} --spatial_coords -44 -11 113 154 --month 11 --shapefile ${SHAPEFILE} --spatial_agg ${SPATIAL_AGG} --units ${UNITS} --units_timing middle ${MODEL_IO_OPTIONS}
 OBS_TXT_DATA=${PROJECT_DIR}/data/pr_BoM_1900-2021_nov_aus-mean.txt
@@ -36,7 +35,7 @@ ${FCST_DATA} :
 ## process-forecast : preprocessing of CAFE forecast ensemble
 process-forecast : ${FCST_ENSEMBLE_FILE}
 ${FCST_ENSEMBLE_FILE} : ${FCST_DATA}
-	fileio $< $@ --forecast ${IO_OPTIONS} --reset_times --output_chunks lead_time=50 --dask_config ${DASK_CONFIG}
+	fileio $< $@ --forecast ${IO_OPTIONS} --reset_times --output_chunks lead_time=50 --dask_config ${DASK_CONFIG} --verbose
 
 ## independence-test : independence test for different lead times
 independence-test : ${INDEPENDENCE_PLOT}
