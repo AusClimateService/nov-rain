@@ -19,7 +19,8 @@ FCST_DATA=file_lists/${MODEL}_dcppA-hindcast_files.txt
 FCST_ENSEMBLE_FILE=${PROJECT_DIR}/data/${VAR}_${MODEL}-dcppA-hindcast_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}.zarr.zip
 INDEPENDENCE_PLOT=${PROJECT_DIR}/figures/independence-test_${VAR}_${MODEL}-dcppA-hindcast_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}.png
 FCST_BIAS_FILE=${PROJECT_DIR}/data/${VAR}_${MODEL}-dcppA-hindcast_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_bias-corrected-BoM-${BIAS_METHOD}.zarr.zip
-SIMILARITY_FILE=${PROJECT_DIR}/data/ks-test_${VAR}_${MODEL}-dcppA-hindcast_${BASE_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_bias-corrected-BoM-${BIAS_METHOD}.zarr.zip
+SIMILARITY_BIAS_FILE=${PROJECT_DIR}/data/ks-test_${VAR}_${MODEL}-dcppA-hindcast_${BASE_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_bias-corrected-BoM-${BIAS_METHOD}.zarr.zip
+SIMILARITY_RAW_FILE=${PROJECT_DIR}/data/ks-test_${VAR}_${MODEL}-dcppA-hindcast_${BASE_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_BoM.zarr.zip
 
 
 ## format-obs : txt to nc
@@ -47,15 +48,20 @@ bias-correction : ${FCST_BIAS_FILE}
 ${FCST_BIAS_FILE} : ${FCST_ENSEMBLE_FILE} ${OBS_NC_DATA}
 	bias_correction $< $(word 2,$^) ${VAR} ${BIAS_METHOD} $@ --base_period ${BASE_PERIOD} --rounding_freq A --min_lead ${MIN_LEAD}
 
-## similarity-test : similarity test between observations and bias corrected forecast
-similarity-test : ${SIMILARITY_FILE}
-${SIMILARITY_FILE} : ${FCST_BIAS_FILE} ${OBS_NC_DATA}
+## similarity-test-bias : similarity test between observations and bias corrected forecast
+similarity-test-bias : ${SIMILARITY_BIAS_FILE}
+${SIMILARITY_BIAS_FILE} : ${FCST_BIAS_FILE} ${OBS_NC_DATA}
+	similarity $< $(word 2,$^) ${VAR} $@ --reference_time_period ${BASE_PERIOD}
+
+## similarity-test-raw : similarity test between observations and raw forecast
+similarity-test-raw : ${SIMILARITY_RAW_FILE}
+${SIMILARITY_RAW_FILE} : ${FCST_ENSEMBLE_FILE} ${OBS_NC_DATA}
 	similarity $< $(word 2,$^) ${VAR} $@ --reference_time_period ${BASE_PERIOD}
 
 ## analysis : do the final analysis
-analysis : analysis_${MODEL}.ipynb
-analysis_${MODEL}.ipynb : analysis.ipynb ${OBS_NC_DATA} ${FCST_ENSEMBLE_FILE} ${FCST_BIAS_FILE} ${SIMILARITY_FILE} ${INDEPENDENCE_PLOT}
-	papermill -p bom_file $(word 2,$^) -p model_file $(word 3,$^) -p model_bc_file $(word 4,$^) -p fidelity_file $(word 5,$^) -p independence_plot $(word 6,$^) -p model_name ${MODEL} -p min_lead ${MIN_LEAD} $< $@
+analysis : analysis/analysis_${MODEL}.ipynb
+analysis_${MODEL}.ipynb : analysis/analysis.ipynb ${OBS_NC_DATA} ${FCST_ENSEMBLE_FILE} ${FCST_BIAS_FILE} ${SIMILARITY_BIAS_FILE} ${SIMILARITY_RAW_FILE} ${INDEPENDENCE_PLOT}
+	papermill -p bom_file $(word 2,$^) -p model_file $(word 3,$^) -p model_bc_file $(word 4,$^) -p similarity_bc_file $(word 5,$^) -p similarity_raw_file $(word 6,$^) -p independence_plot $(word 7,$^) -p model_name ${MODEL} -p min_lead ${MIN_LEAD} $< $@
 
 ## help : show this message
 help :
