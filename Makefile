@@ -10,17 +10,18 @@ UNITS=${VAR}='mm month-1'
 SHAPEFILE=${PROJECT_DIR}/shapefiles/australia.shp
 SPATIAL_AGG=mean
 TIME_AGG=sum
+BIAS_METHOD=multiplicative
 DASK_CONFIG=dask_local.yml
 IO_OPTIONS=--variables ${VAR} --spatial_coords -44 -11 113 154 --month 11 --shapefile ${SHAPEFILE} --spatial_agg ${SPATIAL_AGG} --units ${UNITS} --units_timing middle ${MODEL_IO_OPTIONS}
 OBS_TXT_DATA=${PROJECT_DIR}/data/pr_BoM_1900-2021_nov_aus-mean.txt
 OBS_NC_DATA=${PROJECT_DIR}/data/pr_BoM_1900-2021_nov_aus-mean.nc
 OBS_URL=http://www.bom.gov.au/climate/change/
-FCST_DATA=file_lists/${MODEL}_dcppA-hindcast_files.txt
-FCST_ENSEMBLE_FILE=${PROJECT_DIR}/data/${VAR}_${MODEL}-dcppA-hindcast_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}.zarr.zip
-INDEPENDENCE_PLOT=${PROJECT_DIR}/figures/independence-test_${VAR}_${MODEL}-dcppA-hindcast_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}.png
-FCST_BIAS_FILE=${PROJECT_DIR}/data/${VAR}_${MODEL}-dcppA-hindcast_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_bias-corrected-BoM-${BIAS_METHOD}.zarr.zip
-SIMILARITY_BIAS_FILE=${PROJECT_DIR}/data/ks-test_${VAR}_${MODEL}-dcppA-hindcast_${BASE_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_bias-corrected-BoM-${BIAS_METHOD}.zarr.zip
-SIMILARITY_RAW_FILE=${PROJECT_DIR}/data/ks-test_${VAR}_${MODEL}-dcppA-hindcast_${BASE_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_BoM.zarr.zip
+FCST_DATA=file_lists/${MODEL}_${EXPERIMENT}_files.txt
+FCST_ENSEMBLE_FILE=${PROJECT_DIR}/data/${VAR}_${MODEL}-${EXPERIMENT}_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}.zarr.zip
+INDEPENDENCE_PLOT=${PROJECT_DIR}/figures/independence-test_${VAR}_${MODEL}-${EXPERIMENT}_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}.png
+FCST_BIAS_FILE=${PROJECT_DIR}/data/${VAR}_${MODEL}-${EXPERIMENT}_${TIME_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_bias-corrected-BoM-${BIAS_METHOD}.zarr.zip
+SIMILARITY_BIAS_FILE=${PROJECT_DIR}/data/ks-test_${VAR}_${MODEL}-${EXPERIMENT}_${BASE_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_bias-corrected-BoM-${BIAS_METHOD}.zarr.zip
+SIMILARITY_RAW_FILE=${PROJECT_DIR}/data/ks-test_${VAR}_${MODEL}-${EXPERIMENT}_${BASE_PERIOD_TEXT}_nov_aus-${SPATIAL_AGG}_BoM.zarr.zip
 
 
 ## format-obs : txt to nc
@@ -60,7 +61,7 @@ ${SIMILARITY_RAW_FILE} : ${FCST_ENSEMBLE_FILE} ${OBS_NC_DATA}
 
 ## analysis : do the final analysis
 analysis : analysis/analysis_${MODEL}.ipynb
-analysis_${MODEL}.ipynb : analysis/analysis.ipynb ${OBS_NC_DATA} ${FCST_ENSEMBLE_FILE} ${FCST_BIAS_FILE} ${SIMILARITY_BIAS_FILE} ${SIMILARITY_RAW_FILE} ${INDEPENDENCE_PLOT}
+analysis/analysis_${MODEL}.ipynb : analysis/analysis.ipynb ${OBS_NC_DATA} ${FCST_ENSEMBLE_FILE} ${FCST_BIAS_FILE} ${SIMILARITY_BIAS_FILE} ${SIMILARITY_RAW_FILE} ${INDEPENDENCE_PLOT}
 	papermill -p bom_file $(word 2,$^) -p model_file $(word 3,$^) -p model_bc_file $(word 4,$^) -p similarity_bc_file $(word 5,$^) -p similarity_raw_file $(word 6,$^) -p independence_plot $(word 7,$^) -p model_name ${MODEL} -p min_lead ${MIN_LEAD} $< $@
 
 ## help : show this message
